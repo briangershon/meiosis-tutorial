@@ -47,17 +47,18 @@ const view = createView(update);
 
 const element = document.getElementById('app');
 
-update.map((value) => {
+function updateModel(value) {
   model.value += value;
-  ReactDOM.render(view(model), element);
-  return null;
-});
+  return model;
+}
 
-// // play with stream
-// const timesTen = update.map(value => value * 10);
-// const plusTwo = timesTen.map(value => value + 2);
-// plusTwo.map((value) => {
-//   console.log('value', value);
-// });
+function render(value) {
+  ReactDOM.render(value, element);
+}
+
+update
+  .map(updateModel)
+  .map(view)
+  .map(render);
 
 ReactDOM.render(view(model), element);
