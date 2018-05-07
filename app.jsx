@@ -1,6 +1,25 @@
 /* eslint-disable no-use-before-define, func-names */
 /* global React, ReactDOM */
 
+function stream() {
+  const mapFunctions = [];
+  function createdStream(value) {
+    mapFunctions.forEach((fn) => {
+      fn(value);
+    });
+  }
+  createdStream.map = function (mapFunction) {
+    const newStream = stream();
+
+    mapFunctions.push((value) => {
+      newStream(mapFunction(value));
+    });
+
+    return newStream;
+  };
+  return createdStream;
+}
+
 function createView(updateFn) {
   function increase(amount) {
     return function () {
@@ -22,13 +41,23 @@ function createView(updateFn) {
 }
 
 const model = { label: 'The Counter', value: 0 };
-const element = document.getElementById('app');
-let view;
 
-function update(value) {
+const update = stream();
+const view = createView(update);
+
+const element = document.getElementById('app');
+
+update.map((value) => {
   model.value += value;
   ReactDOM.render(view(model), element);
-}
+  return null;
+});
 
-view = createView(update);
+// // play with stream
+// const timesTen = update.map(value => value * 10);
+// const plusTwo = timesTen.map(value => value + 2);
+// plusTwo.map((value) => {
+//   console.log('value', value);
+// });
+
 ReactDOM.render(view(model), element);
