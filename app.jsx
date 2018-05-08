@@ -45,10 +45,10 @@ function createView(updateFn) {
     };
   }
 
-  function view(m, label) {
+  function view(m) {
     return (
       <div>
-        <div>{label} is at {m}.</div>
+        <div>{m.label} is at {m.value}.</div>
         <button onClick={oper({ oper: 'add', value: 1 })}>+1</button>
         <button onClick={oper({ oper: 'times', value: 2 })}>*2</button>
         <button onClick={oper({ oper: 'add', value: 5 })}>+5</button>
@@ -63,12 +63,12 @@ const view = createView(update);
 
 const models = scan((model, obj) => {
   if (obj.oper === 'add') {
-    return model + obj.value;
+    return Object.assign({}, { label: 'The Counter', value: model.value + obj.value });
   } else if (obj.oper === 'times') {
-    return model * obj.value;
+    return Object.assign({}, { label: 'The Counter', value: model.value * obj.value });
   }
   return model;
-}, 0, update);
+}, { label: 'The Counter', value: 0 }, update);
 
 const element = document.getElementById('app');
 
@@ -77,5 +77,5 @@ function render(viewFromModel) {
 }
 
 models
-  .map(value => view(value, 'The Counter'))
+  .map(value => view(value))
   .map(render);
